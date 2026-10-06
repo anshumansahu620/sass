@@ -5,6 +5,8 @@ from core.models import AppUser
 
 class Organisation(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
+    owner=models.ForeignKey(AppUser,on_delete=models.CASCADE, null=True,blank=True)
+
     org_name = models.CharField(max_length=255)
     logo = models.ImageField(upload_to="logos/", blank=True, null=True)
 
