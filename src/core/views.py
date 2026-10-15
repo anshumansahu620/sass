@@ -187,10 +187,16 @@ class ResetPassword(GenericAPIView):
     parser_classes = [JSONParser, FormParser, MultiPartParser]
 
     @swagger_auto_schema(
+        operation_description="Reset the authenticated user's password. Requires JWT Bearer token.",
         request_body=RESET_PASSWORD_BODY,
         consumes=['application/json'],
         produces=['application/json'],
-        responses={200: openapi.Response('Password reset')},
+        security=[{'Bearer': []}],
+        responses={
+            200: openapi.Response('Password reset successful'),
+            400: openapi.Response('Wrong password or validation error'),
+            401: openapi.Response('Unauthorized'),
+        },
     )
     def post(self, request):
         serializer = self.get_serializer(data=request.data)

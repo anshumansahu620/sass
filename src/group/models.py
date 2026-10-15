@@ -9,6 +9,7 @@ class Organisation(models.Model):
 
     org_name = models.CharField(max_length=255)
     logo = models.ImageField(upload_to="logos/", blank=True, null=True)
+    bio=models.TextField(max_length=1000, default="we are new", blank=True, null=True)
 
     def __str__(self):
         return self.org_name
@@ -24,6 +25,8 @@ class Group(models.Model):
     members = models.ManyToManyField(
         AppUser, through="GroupMember", related_name="chat_groups"
     )
+    group_admin=models.ForeignKey(AppUser,on_delete=models.CASCADE)
+    
 
     def __str__(self):
         return f"{self.group_name} ({self.organisation})"
