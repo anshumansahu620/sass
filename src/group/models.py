@@ -22,12 +22,10 @@ class Group(models.Model):
     )
     group_name = models.CharField(max_length=255)
     group_logo = models.ImageField(upload_to="group/icons/", blank=True, null=True)
-    members = models.ManyToManyField(
-        AppUser, through="GroupMember", related_name="chat_groups"
-    )
-    group_admin=models.ForeignKey(AppUser,on_delete=models.CASCADE)
-    
 
+    group_admin=models.ForeignKey(AppUser,on_delete=models.CASCADE, related_name="admin_of_group",null=True,blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
     def __str__(self):
         return f"{self.group_name} ({self.organisation})"
 
@@ -35,7 +33,7 @@ class Group(models.Model):
 class GroupMember(models.Model):
     class Role(models.TextChoices):
         ADMIN = "admin", "Admin"
-        MEMBER = "member", "Member"
+        MEMBER = "member", "Member",
 
     group = models.ForeignKey(
         Group, on_delete=models.CASCADE, related_name="memberships"
