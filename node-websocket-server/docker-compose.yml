@@ -1,0 +1,23 @@
+services:
+  websocket:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: node_websocket_server
+    restart: unless-stopped
+    ports:
+      - "${PORT:-8080}:8080"
+    environment:
+      - PORT=8080
+      - NODE_ENV=production
+      - REDIS_URL=redis://redis:6379
+    # Optional: mount local files for hot development
+    # volumes:
+    #   - .:/app
+    #   - /app/node_modules
+    networks:
+      - default
+
+networks:
+  default:
+    name: websocket_network
