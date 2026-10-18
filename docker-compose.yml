@@ -1,22 +1,40 @@
 services:
+  # Container 1: Django Web Application
   web:
     build: .
     container_name: web_app
+    restart: always
+    ports:
+      - "8000:8000"
     volumes:
       - ./src:/app
       - static_volume:/app/staticfiles
       - media_volume:/app/media
     env_file:
       - .env
-    ports:
-      - "8000:8000"
     depends_on:
       db:
         condition: service_healthy
       redis:
         condition: service_healthy
-    restart: always
 
+  # Container 2: Node.js WebSocket Server
+  websocket:
+    build: ./node-websocket-server
+    container_name: node_websocket_server
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      - PORT=8080
+      - NODE_ENV=production
+      - REDIS_URL=redis://redis:6379
+      - MONGO_URL=mongodb://mongo:27017/chatapp
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  # Container 3: PostgreSQL Database (Shared Auth)
   db:
     image: postgres:17
     container_name: postgres_db_use
@@ -34,6 +52,7 @@ services:
       retries: 10
       start_period: 10s
 
+  # Container 4: Redis Cache & Message Broker
   redis:
     image: redis:7-alpine
     container_name: redis_cache_ofdb
@@ -46,7 +65,18 @@ services:
       timeout: 3s
       retries: 5
 
+  # Container 5: MongoDB (Document Store)
+  mongo:
+    image: mongo:7
+    container_name: mongodb_service
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
 volumes:
   postgres_data:
   static_volume:
   media_volume:
+  mongo_data:
